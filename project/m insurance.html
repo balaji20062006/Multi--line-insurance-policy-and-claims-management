@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureAll Insurance - Multi-Line Management Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95)), url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            z-index: 50;
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-btn.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-active { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.5); }
+        .status-pending { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.5); }
+        .status-closed { background-color: rgba(107, 114, 128, 0.2); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.5); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <nav class="glass-panel sticky top-0 z-40 px-6 py-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.5)]">
+                <i class="fa-solid fa-shield-halved text-white text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-wide">SecureAll</h1>
+                <p class="text-xs text-slate-400">Multi-Line Management</p>
+            </div>
+        </div>
+        
+        <div class="hidden md:flex items-center gap-6">
+            <button class="text-slate-300 hover:text-white transition-colors"><i class="fa-solid fa-bell"></i></button>
+            <button class="text-slate-300 hover:text-white transition-colors"><i class="fa-solid fa-gear"></i></button>
+            <div class="flex items-center gap-3 pl-4 border-l border-slate-600">
+                <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Profile" class="w-8 h-8 rounded-full border border-slate-500">
+                <span class="text-sm font-medium">Admin Portal</span>
+            </div>
+        </div>
+        
+        <button class="md:hidden text-slate-300"><i class="fa-solid fa-bars text-xl"></i></button>
+    </nav>
+
+    <main class="flex-1 container mx-auto px-4 py-8 max-w-7xl">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="glass-panel rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all"></div>
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium">Total Active Policies</p>
+                        <h2 class="text-3xl font-bold text-white mt-1">1,248</h2>
+                    </div>
+                    <div class="p-3 bg-slate-800 rounded-lg text-blue-400">
+                        <i class="fa-solid fa-file-contract"></i>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm">
+                    <span class="text-emerald-400"><i class="fa-solid fa-arrow-up mr-1"></i>4.2%</span>
+                    <span class="text-slate-500 ml-2">vs last month</span>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all"></div>
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium">Open Claims</p>
+                        <h2 class="text-3xl font-bold text-white mt-1" id="openClaimsCount">86</h2>
+                    </div>
+                    <div class="p-3 bg-slate-800 rounded-lg text-amber-400">
+                        <i class="fa-solid fa-file-circle-exclamation"></i>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm">
+                    <span class="text-rose-400"><i class="fa-solid fa-arrow-up mr-1"></i>12.5%</span>
+                    <span class="text-slate-500 ml-2">Requires attention</span>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium">Monthly Premiums</p>
+                        <h2 class="text-3xl font-bold text-white mt-1">$4.2M</h2>
+                    </div>
+                    <div class="p-3 bg-slate-800 rounded-lg text-emerald-400">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm">
+                    <span class="text-emerald-400"><i class="fa-solid fa-arrow-up mr-1"></i>2.1%</span>
+                    <span class="text-slate-500 ml-2">vs last month</span>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-all"></div>
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium">Settlement Rate</p>
+                        <h2 class="text-3xl font-bold text-white mt-1">94.8%</h2>
+                    </div>
+                    <div class="p-3 bg-slate-800 rounded-lg text-purple-400">
+                        <i class="fa-solid fa-handshake-angle"></i>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm">
+                    <span class="text-emerald-400"><i class="fa-solid fa-arrow-up mr-1"></i>0.5%</span>
+                    <span class="text-slate-500 ml-2">Avg processing: 4 days</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel rounded-xl shadow-lg overflow-hidden flex flex-col h-[600px]">
+            <!-- Tabs Header -->
+            <div class="flex border-b border-slate-700 bg-slate-800/50">
+                <button onclick="switchTab('policies')" id="btn-policies" class="tab-btn active flex-1 py-4 text-sm font-medium text-slate-300 hover:text-white transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-folder-open"></i> Policy Management
+                </button>
+                <button onclick="switchTab('claims')" id="btn-claims" class="tab-btn flex-1 py-4 text-sm font-medium text-slate-300 hover:text-white transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-gavel"></i> Claims Center
+                </button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-1 overflow-hidden relative">
+                
+                <!-- Policies View -->
+                <div id="view-policies" class="absolute inset-0 p-6 overflow-y-auto fade-in">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                        <h3 class="text-xl font-bold text-white">Active Policies across Lines</h3>
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <div class="relative w-full md:w-64">
+                                <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
+                                <input type="text" id="policySearch" placeholder="Search policy or client..." class="w-full bg-slate-900/50 border border-slate-600 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                            </div>
+                            <button onclick="openModal('newPolicyModal')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2 shadow-lg shadow-blue-600/20">
+                                <i class="fa-solid fa-plus"></i> New Policy
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/50 rounded-lg border border-slate-700 overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-700 bg-slate-800/80">
+                                    <th class="py-3 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider">Policy ID</th>
+                                    <th class="py-3 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider">Client Name</th>
+                                    <th class="py-3 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider">Line of Business</th>
+                                    <th class="py-3 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider">Premium (Ann.)</th>
+                                    <th class="py-3 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider">Status</th>
+                                    <th class="py-3 px-4 text-xs font-semibold text-slate-300 uppercase tracking-wider text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="policyTableBody" class="divide-y divide-slate-700">
+                                <!-- Data populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Claims View -->
+                <div id="view-claims" class="absolute inset-0 p-6 overflow-y-auto hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                        <h3 class="text-xl font-bold text-white">Claims Processing Queue</h3>
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <select id="claimFilter" class="bg-slate-900/50 border border-slate-600 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                                <option value="all">All Claims</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Under Review">Under Review</option>
+                            </select>
+                            <button onclick="openModal('fileClaimModal')" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2 shadow-lg shadow-amber-600/20">
+                                <i class="fa-solid fa-file-invoice"></i> File Claim
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="claimsGrid">
+                        <!-- Claims cards populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- New Policy Modal -->
+    <div id="newPolicyModal" class="modal">
+        <div class="modal-content glass-panel w-full max-w-2xl rounded-xl shadow-2xl p-6 border border-slate-600 mx-4">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-file-signature text-blue-500"></i> Issue New Policy
+                </h2>
+                <button onclick="closeModal('newPolicyModal')" class="text-slate-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="newPolicyForm" onsubmit="handleNewPolicy(event)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Client Full Name</label>
+                        <input type="text" id="np-name" required class="w-full bg-slate-900/80 border border-slate-600 rounded-lg px-3 py-2 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Contact Email</label>
+                        <input type="email" id="np-email" required class="w-full bg-slate-900/80 border border-slate-600 rounded-lg px-3 py-2 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Line of Business (LOB)</label>
+                        <select id="np-lob" required class="w-full bg-slate-900/80 border border-slate-600 rounded-lg px-3 py-2 text-white focus:border-blue-500 focus:outline-none">
+                            <option value="Commercial Property">Commercial Property</option>
+                            <option value="General Liability">General Liability</option>
+                            <option value="Auto Fleet">Auto Fleet</option>
+                            <option value="Workers Comp">Workers Comp</option>
+                            <option value="Cyber Security">Cyber Security</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Annual Premium ($)</label>
+                        <input type="number" id="np-premium" required min="100" class="w-full bg-slate-900/80 border border-slate-600 rounded-lg px-3 py-2 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Coverage Details</label>
+                        <textarea id="np-details" rows="3" class="w-full bg-slate-900/80 border border-slate-600 rounded-lg px-3 py-2 text-white focus:border-blue-500 focus:outline-none"></textarea>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-700">
+                    <button type="button" onclick="closeModal('newPolicyModal')" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 transition-colors border border-slate-600">Cancel</button>
+                    <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/30">Issue Policy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- File Claim Modal -->
+    <div id="fileClaimModal" class="modal">
+        <div class="modal-content glass-panel w-full max-w-2xl rounded-xl shadow-2xl p-6 border border-slate-600 mx-4">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-truck-medical text-amber-500"></i> File New Claim
+                </h2>
+                <button onclick="closeModal('fileClaimModal')" class="text-slate-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="newClaimForm" onsubmit="handleNewClaim(event)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Policy ID</label>
+                        <!-- In a real app this would be a search/select dropdown -->
+                        <input type="text" id="nc-policy" required placeholder="e.g., POL-..." class="w-full bg-slate-900/80 border border-slate-600 rounded-lg px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Date of Loss</label>
+                        <input type="date" id="nc-date" required class="w-full bg-slate-900/80 border border-slate-600 rounded-lg px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Estimated Reserve Amount ($)</label>
+                        <input type="number" id="nc-reserve" required class="w-full bg-slate-900/80 border border-slate-600 rounded-lg px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Claim Type</label>
+                        <select id="nc-type" required class="w-full bg-slate-900/80 border border-slate-600 rounded-lg px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
+                            <option value="Property Damage">Property Damage</option>
+                            <option value="Bodily Injury">Bodily Injury</option>
+                            <option value="Theft">Theft</option>
+                            <option value="Business Interruption">Business Interruption</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Description of Loss</label>
+                        <textarea id="nc-desc" required rows="3" class="w-full bg-slate-900/80 border border-slate-600 rounded-lg px-3 py-2 text-white focus:border-amber-500 focus:outline-none"></textarea>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-700">
+                    <button type="button" onclick="closeModal('fileClaimModal')" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 transition-colors border border-slate-600">Cancel</button>
+                    <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 transition-colors shadow-lg shadow-amber-600/30">Submit Claim</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- Mock Data ---
+        let policies = [
+            { id: 'POL-2023-8941', client: 'TechNova Solutions', lob: 'Cyber Security', premium: 45000, status: 'Active' },
+            { id: 'POL-2023-7720', client: 'Midwest Logistics', lob: 'Auto Fleet', premium: 120000, status: 'Active' },
+            { id: 'POL-2022-3118', client: 'Apex Construction', lob: 'Workers Comp', premium: 85500, status: 'Active' },
+            { id: 'POL-2023-9902', client: 'Bayside Retailers', lob: 'Commercial Property', premium: 32000, status: 'Pending Renewal' },
+            { id: 'POL-2021-1055', client: 'Dr. Smith Associates', lob: 'General Liability', premium: 15000, status: 'Active' }
+        ];
+
+        let claims = [
+            { id: 'CLM-00912', policyId: 'POL-2022-3118', client: 'Apex Construction', type: 'Bodily Injury', reserve: 45000, date: '2023-10-15', status: 'Under Review' },
+            { id: 'CLM-00913', policyId: 'POL-2023-7720', client: 'Midwest Logistics', type: 'Property Damage', reserve: 12500, date: '2023-10-18', status: 'Pending' },
+            { id: 'CLM-00908', policyId: 'POL-2023-9902', client: 'Bayside Retailers', type: 'Theft', reserve: 8000, date: '2023-10-02', status: 'Investigation' },
+            { id: 'CLM-00890', policyId: 'POL-2023-8941', client: 'TechNova Solutions', type: 'Business Interruption', reserve: 150000, date: '2023-09-20', status: 'Settled' }
+        ];
+
+        // --- UI Logic ---
+        
+        function switchTab(tabName) {
+            // Update Buttons
+            document.getElementById('btn-policies').classList.remove('active');
+            document.getElementById('btn-claims').classList.remove('active');
+            document.getElementById(`btn-${tabName}`).classList.add('active');
+
+            // Update Views
+            document.getElementById('view-policies').classList.add('hidden');
+            document.getElementById('view-policies').classList.remove('fade-in');
+            document.getElementById('view-claims').classList.add('hidden');
+            document.getElementById('view-claims').classList.remove('fade-in');
+
+            const activeView = document.getElementById(`view-${tabName}`);
+            activeView.classList.remove('hidden');
+            
+            // Force reflow to trigger animation
+            void activeView.offsetWidth; 
+            activeView.classList.add('fade-in');
+        }
+
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+        }
+
+        function getStatusBadge(status) {
+            const lStatus = status.toLowerCase();
+            let badgeClass = 'status-closed'; // default
+            
+            if (lStatus.includes('active') || lStatus.includes('settled')) badgeClass = 'status-active';
+            if (lStatus.includes('pending') || lStatus.includes('review') || lStatus.includes('investigation')) badgeClass = 'status-pending';
+            
+            return `<span class="status-badge ${badgeClass}">${status}</span>`;
+        }
+        
+        function getLOBIcon(lob) {
+            const icons = {
+                'Cyber Security': '<i class="fa-solid fa-network-wired text-blue-400"></i>',
+                'Auto Fleet': '<i class="fa-solid fa-truck text-slate-400"></i>',
+                'Workers Comp': '<i class="fa-solid fa-user-injured text-amber-400"></i>',
+                'Commercial Property': '<i class="fa-solid fa-building text-emerald-400"></i>',
+                'General Liability': '<i class="fa-solid fa-scale-balanced text-purple-400"></i>'
+            };
+            return icons[lob] || '<i class="fa-solid fa-file text-slate-400"></i>';
+        }
+
+        function renderPolicies(filterText = '') {
+            const tbody = document.getElementById('policyTableBody');
+            tbody.innerHTML = '';
+            
+            const filtered = policies.filter(p => 
+                p.id.toLowerCase().includes(filterText.toLowerCase()) || 
+                p.client.toLowerCase().includes(filterText.toLowerCase())
+            );
+
+            filtered.forEach(policy => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/50 transition-colors group';
+                tr.innerHTML = `
+                    <td class="py-4 px-4 font-mono text-sm text-blue-400 font-medium">${policy.id}</td>
+                    <td class="py-4 px-4 font-medium text-white">${policy.client}</td>
+                    <td class="py-4 px-4 text-slate-300 flex items-center gap-2">${getLOBIcon(policy.lob)} ${policy.lob}</td>
+                    <td class="py-4 px-4 text-slate-300 font-mono">${formatCurrency(policy.premium)}</td>
+                    <td class="py-4 px-4">${getStatusBadge(policy.status)}</td>
+                    <td class="py-4 px-4 text-right">
+                        <button class="text-slate-400 hover:text-blue-400 transition-colors mr-2"><i class="fa-solid fa-eye"></i></button>
+                        <button class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderClaims(statusFilter = 'all') {
+            const grid = document.getElementById('claimsGrid');
+            grid.innerHTML = '';
+            
+            let filtered = claims;
+            if (statusFilter !== 'all') {
+                filtered = claims.filter(c => c.status === statusFilter);
+            }
+
+            // Update stats
+            const openClaimsCount = claims.filter(c => c.status !== 'Settled' && c.status !== 'Closed').length;
+            document.getElementById('openClaimsCount').innerText = openClaimsCount;
+
+            filtered.forEach(claim => {
+                const isUrgent = claim.status === 'Pending';
+                const card = document.createElement('div');
+                card.className = `bg-slate-900/50 rounded-xl border ${isUrgent ? 'border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.1)]' : 'border-slate-700'} p-5 hover:border-slate-500 transition-colors relative overflow-hidden group`;
+                
+                card.innerHTML = `
+                    ${isUrgent ? '<div class="absolute top-0 right-0 w-16 h-16 bg-amber-500/10 rounded-bl-full"></div>' : ''}
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="font-mono text-xs text-amber-400 bg-amber-400/10 px-2 py-1 rounded">${claim.id}</span>
+                        ${getStatusBadge(claim.status)}
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-1">${claim.client}</h4>
+                    <p class="text-sm text-slate-400 mb-4 pb-4 border-b border-slate-700">Ref: ${claim.policyId}</p>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <p class="text-xs text-slate-500">Loss Type</p>
+                            <p class="text-sm font-medium text-slate-200 truncate" title="${claim.type}">${claim.type}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500">Date of Loss</p>
+                            <p class="text-sm font-medium text-slate-200">${claim.date}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
+                        <span class="text-xs text-slate-400">Est. Reserve</span>
+                        <span class="font-bold text-white font-mono">${formatCurrency(claim.reserve)}</span>
+                    </div>
+                    
+                    <div class="mt-4 flex gap-2">
+                        <button class="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-sm py-2 rounded-lg transition-colors border border-slate-600">Review</button>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors shadow-lg shadow-blue-600/20"><i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- Modal Handling ---
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent bg scrolling
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = 'auto';
+            // Reset forms if applicable
+            const form = document.querySelector(`#${id} form`);
+            if (form) form.reset();
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // --- Form Submissions ---
+        function handleNewPolicy(e) {
+            e.preventDefault();
+            
+            // Generate mock ID
+            const newId = `POL-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            
+            const newPolicy = {
+                id: newId,
+                client: document.getElementById('np-name').value,
+                lob: document.getElementById('np-lob').value,
+                premium: parseFloat(document.getElementById('np-premium').value),
+                status: 'Active' // default
+            };
+            
+            // Add to array at beginning
+            policies.unshift(newPolicy);
+            
+            // Re-render and close
+            renderPolicies();
+            closeModal('newPolicyModal');
+            
+            // Provide feedback (using custom UI element instead of alert)
+            showNotification(`Policy ${newId} issued successfully!`, 'success');
+        }
+
+        function handleNewClaim(e) {
+            e.preventDefault();
+            
+            const newId = `CLM-0${Math.floor(1000 + Math.random() * 9000)}`;
+            const policyIdInput = document.getElementById('nc-policy').value;
+            
+            // Basic lookup simulation (in reality, query database)
+            const relatedPolicy = policies.find(p => p.id === policyIdInput);
+            const clientName = relatedPolicy ? relatedPolicy.client : 'Unknown Client';
+            
+            const newClaim = {
+                id: newId,
+                policyId: policyIdInput,
+                client: clientName,
+                type: document.getElementById('nc-type').value,
+                reserve: parseFloat(document.getElementById('nc-reserve').value),
+                date: document.getElementById('nc-date').value,
+                status: 'Pending' // Initial state
+            };
+            
+            claims.unshift(newClaim);
+            
+            // Update view if on claims tab
+            renderClaims(document.getElementById('claimFilter').value);
+            closeModal('fileClaimModal');
+            
+            showNotification(`Claim ${newId} filed. Requires initial review.`, 'warning');
+            
+            // Switch to claims tab if not already there to show the new claim
+            if (!document.getElementById('btn-claims').classList.contains('active')) {
+                switchTab('claims');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notif = document.createElement('div');
+            
+            let bgClass, icon;
+            if(type === 'success') { bgClass = 'bg-emerald-600'; icon = 'fa-check-circle'; }
+            else if(type === 'warning') { bgClass = 'bg-amber-600'; icon = 'fa-triangle-exclamation'; }
+            
+            notif.className = `fixed bottom-4 right-4 ${bgClass} text-white px-6 py-3 rounded-lg shadow-xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 z-50`;
+            notif.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium">${message}</span>`;
+            
+            document.body.appendChild(notif);
+            
+            // Animate in
+            setTimeout(() => {
+                notif.classList.remove('translate-y-20', 'opacity-0');
+            }, 10);
+            
+            // Remove after delay
+            setTimeout(() => {
+                notif.classList.add('translate-y-20', 'opacity-0');
+                setTimeout(() => notif.remove(), 300);
+            }, 4000);
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPolicies();
+            renderClaims();
+
+            // Search filter for policies
+            document.getElementById('policySearch').addEventListener('input', (e) => {
+                renderPolicies(e.target.value);
+            });
+
+            // Status filter for claims
+            document.getElementById('claimFilter').addEventListener('change', (e) => {
+                renderClaims(e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>
